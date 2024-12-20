@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounts</title>
+</head>
+<body>
+    <h1>Your Accounts</h1>
+    <table border="1">
+        <tr>
+            <th>Account Name</th>
+            <th>Initial Amount</th>
+            <th>Current Balance</th>
+        </tr>
+        {% for account in accounts %}
+        <tr>
+            <td>{{ account.account_name }}</td>
+            <td>{{ account.initial_amount }}</td>
+            <td>{{ account.current_balance }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>

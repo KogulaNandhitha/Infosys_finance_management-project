@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Goal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            color: #ecf0f1;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #34495e;
+            padding-left: 15px;
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .goal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .goal-table th, .goal-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .goal-table th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .goal-table .achieved {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .goal-form input {
+            padding: 8px;
+            margin: 5px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .goal-form button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .goal-form button:hover {
+            background-color: #2ecc71;
+        }
+
+        .goal h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .goal p {
+            font-size: 1em;
+        }
+
+        .alert {
+            color: white;
+            background-color: #e74c3c;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Account</a>
+        <a href="/add_goal">Bills</a>
+        <a href="/add-amount">Goals</a>
+        <a href="/logout">Logout</a>
+    </div>
+    <!-- Main content -->
+    <div class="main-content">
+        <h1>Add Goal</h1>
+
+        <!-- Goal Form -->
+        <form method="POST" class="goal-form">
+            <label for="goal_name">Goal Name:</label>
+            <input type="text" name="goal_name" required><br><br>
+
+            <label for="description">Goal Description:</label>
+            <input type="text" name="description" required><br><br>
+
+            <label for="target_amount">Target Amount:</label>
+            <input type="number" name="target_amount" required><br><br>
+
+            <button type="submit">Add Goal</button>
+        </form>
+
+        <!-- Goal Achievement Message -->
+        {% if goal_achieved %}
+        <div class="alert">
+            Congratulations! You have achieved your goal!
+        </div>
+        {% endif %}
+
+        <!-- Goals Table -->
+        <h3>Your Goals</h3>
+
+        {% if goals %}
+        <table class="goal-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Target Amount</th>
+                    <th>Current Balance</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in goals %}
+                <tr class="{{ 'achieved' if goal.current_balance >= goal.target_amount else '' }}">
+                    <td>{{ goal.description }}</td>
+                    <td>${{ goal.target_amount }}</td>
+                    <td>${{ goal.current_balance }}</td>
+                    <td>{{ 'Achieved' if goal.current_balance >= goal.target_amount else 'In Progress' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No goals set.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

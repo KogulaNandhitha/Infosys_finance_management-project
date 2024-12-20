@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background-color: rgb(255, 255, 255);
+            color: black;
+            padding: 15px;
+            text-align: center;
+        }
+        main {
+            margin: 20px;
+            text-align: center;
+        }
+        a {
+            color:rgb(0, 0, 0);
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        button {
+            background-color:rgb(47, 19, 227);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 10%;
+        }
+        button:hover {
+            background-color:rgb(36, 15, 79);
+        }
+        p {
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        a {
+            color:rgb(63, 16, 216);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .banner {
+            background-color:rgb(255, 255, 255);
+            color: #333;
+            
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0px 4px 6px 4px rgba(161, 159, 216, 0.56);
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(175, 199, 220, 0.92);
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        
+    
+            .banner img {
+                width: 500px;
+                height:50%;
+                margin-left:100px;
+                margin-top: 20px;
+            }
+        
+        
+    </style>
+</head>
+<body>
+    <header>
+        <p>
+            <a href="/register"> <button> Register </button> </a>  <a href="/login"> <button> Login </button> </a>
+          </p>
+        
+       
+    </header>
+    <main>
+        <div class="banner">
+          
+            <div class="banner">
+                <table>
+                <tr>
+                    <td><p ><h2 style= "color:rgb(23, 42, 250);">  Personal Finance Management Website </h2><h6 style= "color:rgb(50, 12, 158);"><br> Designed and developed by Kogula Nandhitha K. <br>As part of the Infosys Springboard Internship.</h6></p></td>
+                <td><img src="{{ url_for('static', filename='image.png') }}" alt="Banner Image"></td>
+                </tr> </table>
+                
+            </div>
+         </div>
+    </main>
+    <footer>
+        <a href="https://www.linkedin.com/in/kogula-nandhitha-0949241b0/"> Kogula Nandhitha</a>
+    </footer>
+</body>
+</html>

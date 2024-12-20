@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: rgb(23, 0, 114);
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .sidebar a:hover {
+            background-color: rgb(7, 122, 254);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        header {
+            background-color: rgb(47, 19, 227);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        /* Form and Table Styles */
+        form {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: rgb(47, 19, 227);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Account</a>
+        
+        <a href="/add-amount">Bills</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <h1>User Profile</h1>
+        </header>
+
+        <div class="container mt-5">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Add Account Form -->
+            {% if not accounts %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Add Account</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/profile">
+                        <div class="form-group">
+                            <label for="account_name">Account Name</label>
+                            <input type="text" name="account_name" id="account_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="initial_amount">Initial Amount</label>
+                            <input type="number" step="0.01" name="initial_amount" id="initial_amount" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Account</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Add Amount Form -->
+            {% if accounts %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Add Amount to Account</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/profile">
+                        <div class="form-group">
+                            <label for="amount">Amount to Add</label>
+                            <input type="number" step="0.01" name="amount" id="amount" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add Amount</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Account Details Table -->
+            {% if accounts %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>Your Account</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Account Name</th>
+                                <th>Initial Amount</th>
+                                <th>Current Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in accounts %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ account.account_name }}</td>
+                                <td>${{ "%.2f"|format(account.initial_amount) }}</td>
+                                <td>${{ "%.2f"|format(account.balance) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>

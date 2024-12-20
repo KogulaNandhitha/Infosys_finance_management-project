@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions</title>
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: rgb(23, 0, 114);
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .sidebar a:hover {
+            background-color: rgb(7, 122, 254);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        header {
+            background-color: rgb(47, 19, 227);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .chart-container {
+            width: 50%;
+            max-width: 200px;
+            margin: auto;
+        }
+
+        /* Navigation Menu Styles */
+        nav {
+            background-color: rgb(23, 0, 114);
+            overflow: hidden;
+        }
+
+        nav a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            background-color: rgb(7, 122, 254);
+            color: white;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            background: white;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        ul li a {
+            color: #f44336;
+        }
+
+        ul li a:hover {
+            color: #d32f2f;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: rgb(47, 19, 227);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Account</a>
+        <a href="/add_goal">Bills</a>
+        <a href="/add-amount">Goals</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <h1>Dashboard</h1>
+        </header>
+        
+        <div class="chart-container">
+            <canvas id="transactionPieChart"></canvas>
+    
+        </div>
+    </div>
+    
+    <!-- JavaScript to Handle Pie Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('transactionPieChart').getContext('2d');
+        
+            // Fetch transaction data from Flask
+            fetch('/transaction-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const { added, debited } = data.data;
+
+                        // Create the chart
+                        new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: ['Added Amount', 'Debited Amount'],
+                                datasets: [{
+                                    data: [added, debited],
+                                    backgroundColor: ['#4CAF50', '#FF5733'],
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(tooltipItem) {
+                                                const value = tooltipItem.raw;
+                                                return `${tooltipItem.label}: $${value.toFixed(2)}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        alert('Failed to load transaction data.');
+                    }
+                })
+                .catch(error => console.error('Error fetching transaction data:', error));
+        });
+    </script>
+    <!-- templates/add_goal.html -->
+
+
+
+</body>
+</html>

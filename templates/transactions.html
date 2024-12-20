@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transactions</title>
+</head>
+<body>
+    <header>
+        <h1>Dashboard</h1>
+    </header>
+    <nav>
+        <a href="/profile">Home</a>
+        <a href="/dashboard-copy">Dashboard</a>
+        <a href="/transactions">Transactions</a>
+        <a href="/register">Add Bills</a>
+        <a href="/logout">Logout</a>
+    </nav>
+    <main>
+        <h2>Transactions</h2>
+        <ul>
+            {% for bill in bills %}
+                <li>
+                    <span>{{ bill.description }} - ${{ bill.amount }}</span>
+                    <a href="/delete-bill/{{ bill.id }}">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>
