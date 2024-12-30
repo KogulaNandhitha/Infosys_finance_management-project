@@ -8,15 +8,15 @@ from flask import Flask, render_template
 
 # Flask app setup
 app = Flask(__name__)
-app.secret_key = 'key'  # Replace with a strong secret key
+app.secret_key = 'kogula'  # Replace with a strong secret key
 
 # MySQL Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:kogula@localhost/transaction_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Email configuration
-app.config['MAIL_USERNAME'] = 'xyz@gmail.com'  # Replace with your email
-app.config['MAIL_PASSWORD'] = 'password'  # Replace with your email password
+app.config['MAIL_USERNAME'] = 'nandhithakogula@gmail.com'  # Replace with your email
+app.config['MAIL_PASSWORD'] = 'cbbmqbsvtgttpunu'  # Replace with your email password
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
@@ -76,16 +76,16 @@ def add_goal():
         description = request.form['description']
         target_amount = float(request.form['target_amount'])
 
-        # If the goal target amount is greater than or equal to the account balance, notify the user
-        if account and target_amount >= account.balance:
+       
+        if  target_amount <= account.balance:
             # Send email notification to user
             user_email = user.email
-            subject = "Goal Amount Greater Than or Equal to Account Balance"
-            body = f"Hello {user.username},\n\nYou have set a goal with a target amount of ${target_amount:.2f}, which is greater than or equal to your current account balance of ${account.balance:.2f}.\nPlease adjust your goal if needed.\n\nRegards,\nYour App Team"
+            subject = "Goal is achived"
+            body = f"Hello,\n\nYou have set a goal with a target amount of ${target_amount:.2f}, which is leser than or equal to your current account balance of ${account.balance:.2f}.\nCongrats for achivement.\n\nRegards,\nYour App Team"
             send_email(user_email, subject, body)
-
+          
             # Flash a message indicating the user was notified
-            flash(f"Goal amount is greater than or equal to your balance. A notification has been sent to {user_email}.", 'warning')
+            flash(f"Goal is achived", 'warning')
 
         # Create and save a new goal
         new_goal = Goal(description=description, target_amount=target_amount, current_balance=account.balance, user_id=user_id)
@@ -264,7 +264,8 @@ def login():
     #             # body = f'Hello {user.username},\n\nA new bill has been added.\n\nDescription: {description}\nAmount: {amount}\n\nRegards,\nTransaction System'
     # send_email(user_email, subject, body)
     return render_template('login.html')
-@app.route('/add-amount')
+
+@app.route('/add-amount', methods=['GET', 'POST'])
 def add_amount():
     if 'user_id' not in session:
         flash('Please login first.', 'danger')
@@ -274,7 +275,50 @@ def add_amount():
     user = User.query.get(user_id)
     bills = Bill.query.filter_by(user_id=user_id).all()
     notifications = session.get('notifications', [])
+    account = Account.query.filter_by(user_id=user_id).first()  # Fetch user's account
+    goals = Goal.query.filter_by(user_id=user_id).all()  # Fetch user's goals
+
+    if request.method == 'POST':
+        try:
+            # Retrieve and validate the amount from the form
+            added_amount = float(request.form['amount'])
+            
+            if not account:
+                flash('No account found. Please create an account first.', 'danger')
+                return redirect('/dashboard')
+
+            # Update account balance
+            account.balance += added_amount
+            db.session.commit()
+
+            # Update goals
+            for goal in goals:
+                if goal.status == 'Progress':  # Update only in-progress goals
+                    goal.current_balance = account.balance
+
+                    # Check if the goal is achieved
+                    if goal.current_balance >= goal.target_amount:
+                        goal.status = 'Achieved'
+                        
+            # Send email notification to user
+                        user_email = user.email
+                        subject = "Goal is achived"
+                        body = f"Hello,\n\nYou have achived  your goal.\nCongrats for achivement.\n\nRegards,\nYour App Team"
+                        send_email(user_email, subject, body)
+          
+            # Flash a message indicating the user was notified
+         
+
+                        flash(f'Congratulations! Goal "{goal.description}" has been achieved!', 'success')
+             
+            db.session.commit()
+            flash(f'Amount ${added_amount:.2f} added successfully!', 'success')
+
+        except ValueError:
+            flash('Invalid amount entered. Please try again.', 'danger')
+
     return render_template('add-amount.html', user=user, bills=bills, notifications=notifications)
+
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
@@ -285,9 +329,20 @@ def dashboard():
     user = db.session.get(User, user_id)
     bills = Bill.query.filter_by(user_id=user_id).all()
     notifications = session.get('notifications', [])
-    # 
     goals = Goal.query.filter_by(user_id=user_id).all()
-    return render_template('dashboard.html', user=user, bills=bills, notifications=notifications,goals=goals)
+    account = Account.query.filter_by(user_id=user_id).first()  # Fetch the user's account
+
+    balance = account.balance if account else 0.0  # Default to 0.0 if no account exists
+    
+    return render_template(
+        'dashboard.html',
+        user=user,
+        bills=bills,
+        notifications=notifications,
+        goals=goals,
+        balance=balance
+    )
+
 @app.route('/add-bill', methods=['POST'])
 def add_bill():
     if 'user_id' not in session:
@@ -406,8 +461,9 @@ def profile():
         return redirect('/login')
 
     user_id = session['user_id']
+    user = User.query.get(user_id)
     accounts = Account.query.filter_by(user_id=user_id).all()
-
+    goals = Goal.query.filter_by(user_id=user_id).all()  
     if request.method == 'POST':
         if 'account_name' in request.form and 'initial_amount' in request.form:
             # Add New Account
@@ -426,6 +482,7 @@ def profile():
                 balance=initial_amount
             )
             db.session.add(new_account)
+           
             db.session.commit()
             flash("Account added successfully!", "success")
         
@@ -442,6 +499,17 @@ def profile():
                     # Add amount to the first user's account
                     account = accounts[0]
                     account.balance += amount_to_add
+                    goals = Goal.query.filter_by(user_id=user_id).all()
+                    for goal in goals:
+                         goal.current_balance = account.balance
+                         if goal.current_balance >= goal.target_amount:
+                                
+                        
+            # Send email notification to user
+                                user_email = user.email
+                                subject = "Goal is achived"
+                                body = f"Hello,\n\nYou have achived  your goal.\nCongrats for achivement.\n\nRegards,\nYour App Team"
+                                send_email(user_email, subject, body)
                     db.session.commit()
                     flash(f"${amount_to_add:.2f} has been added to your account!", "success")
             except ValueError:
