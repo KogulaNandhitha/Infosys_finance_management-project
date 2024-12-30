@@ -5,7 +5,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color:rgb(179, 204, 243);
+            background-color: rgb(179, 204, 243);
             margin: 0;
             padding: 0;
             display: flex;
@@ -41,7 +41,7 @@
             box-sizing: border-box;
         }
         button {
-            background-color:rgb(7, 69, 176);
+            background-color: rgb(7, 69, 176);
             color: white;
             padding: 10px 20px;
             border: none;
@@ -50,25 +50,48 @@
             width: 100%;
         }
         button:hover {
-            background-color:rgb(69, 86, 160);
+            background-color: rgb(69, 86, 160);
         }
         p {
             margin-top: 15px;
             font-size: 0.9em;
         }
         a {
-            color:rgb(9, 68, 218);
+            color: rgb(9, 68, 218);
             text-decoration: none;
         }
         a:hover {
             text-decoration: underline;
         }
     </style>
+    <script>
+        function validateForm(event) {
+            const username = document.forms["loginForm"]["username"].value;
+            const password = document.forms["loginForm"]["password"].value;
+
+            // Check if username contains any number or special characters
+            const usernameRegex = /^[a-zA-Z_\s]+$/;
+            if (!usernameRegex.test(username)) {
+                alert("Username must not contain any numbers or special symbols.");
+                event.preventDefault(); // Prevent form submission
+                return false;
+            }
+
+            // Check if password is greater than 6 characters
+            if (password.length <= 5) {
+                alert("Password must be greater than 6 characters.");
+                event.preventDefault();
+                return false;
+            }
+
+            return true; // Allow form submission if all validations pass
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Login</h1>
-        <form method="POST">
+        <form name="loginForm" method="POST" onsubmit="return validateForm(event)">
             <label for="username">Username:</label>
             <input type="text" name="username" required><br>
             <label for="password">Password:</label>

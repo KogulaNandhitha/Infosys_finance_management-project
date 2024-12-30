@@ -22,14 +22,16 @@
             position: fixed;
             top: 0;
             left: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar a {
-            display: block;
-            color: white;
-            padding: 14px 16px;
+            padding: 15px;
             text-decoration: none;
+            color: white;
             text-align: center;
+            margin: 10px 0;
         }
 
         .sidebar a:hover {
@@ -120,8 +122,8 @@
     <div class="sidebar">
         <a href="/dashboard">Dashboard</a>
         <a href="/profile">Account</a>
-        <a href="/add_goal">Bills</a>
-        <a href="/add-amount">Goals</a>
+        <a href="/add_goal">Goals</a>
+        <a href="/add-amount">BIlls</a>
         <a href="/logout">Logout</a>
     </div>
 
@@ -148,7 +150,7 @@
             {% for bill in bills %}
                 <li>
                     <span>{{ bill.description }} - ${{ bill.amount }}</span>
-                    <a href="/delete-bill/{{ bill.id }}">Delete</a>
+                  
                 </li>
             {% endfor %}
         </ul>

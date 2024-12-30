@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions</title>
+    <title>Dashboard</title>
     <style>
         /* General Body Styles */
         body {
@@ -53,97 +53,61 @@
             color: white;
             padding: 10px 20px;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         h1 {
             margin: 0;
         }
 
+        .username {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .dashboard-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .dashboard-box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 30px;
+            width: 150px;
+           
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dashboard-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-box a {
+            text-decoration: none;
+            color: rgb(47, 19, 227);
+            font-weight: bold;
+            padding:30px;
+        }
+
+        .dashboard-box a:hover {
+            color: rgb(7, 122, 254);
+        }
         .chart-container {
             width: 50%;
             max-width: 200px;
             margin: auto;
         }
-
-        /* Navigation Menu Styles */
-        nav {
-            background-color: rgb(23, 0, 114);
-            overflow: hidden;
-        }
-
-        nav a {
-            float: left;
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        nav a:hover {
-            background-color: rgb(7, 122, 254);
-            color: white;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        ul li {
-            background: white;
-            border: 1px solid #ddd;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        ul li a {
-            color: #f44336;
-        }
-
-        ul li a:hover {
-            color: #d32f2f;
-        }
-
-        form {
-            background: white;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: rgb(47, 19, 227);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
@@ -165,6 +129,7 @@
             .main-content {
                 margin-left: 0;
             }
+            
         }
     </style>
 </head>
@@ -174,8 +139,8 @@
     <div class="sidebar">
         <a href="/dashboard">Dashboard</a>
         <a href="/profile">Account</a>
-        <a href="/add_goal">Bills</a>
-        <a href="/add-amount">Goals</a>
+        <a href="/add_goal">Goals</a>
+        <a href="/add-amount">Bills</a>
         <a href="/logout">Logout</a>
     </div>
 
@@ -183,21 +148,69 @@
     <div class="main-content">
         <header>
             <h1>Dashboard</h1>
+            <span class="username">Welcome, <span id="username"> {{ user.username }}</span></span>
         </header>
-        
+
+        <div class="dashboard-options">
+            <div class="dashboard-box" style="background:rgb(165, 180, 244);">
+                <a href="/add-amount">Transactions</a>
+            </div>
+            <div class="dashboard-box" style="background:rgb(253, 192, 252);">
+                <a href="/add_goal">Add Goals</a>
+            </div>
+            <div class="dashboard-box" style="background:rgb(254, 247, 123);">
+                <a href="/profile">Account</a>
+            </div>
+            <div class="dashboard-box" style="background:rgb(229, 174, 251);">
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
         <div class="chart-container">
             <canvas id="transactionPieChart"></canvas>
-    
         </div>
+        <div class="dashboard-options">
+            <div class="dashboard-box"  style="background:rgb(180, 255, 255);">
+                <h2>Current Balance</h2>
+                <p id="current-balance" >${{ balance }}</p>
+            </div>
+            
+            
+        
     </div>
-    
-    <!-- JavaScript to Handle Pie Chart -->
+
+    <!-- JavaScript to Handle Username and Pie Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('transactionPieChart').getContext('2d');
+            // Set username dynamically (fetch or set manually)
+           // Replace with dynamic username if needed
         
-            // Fetch transaction data from Flask
+            // Fetch balance and amount spent from backend
+            fetch('/balance-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const { currentBalance, amountSpent } = data.data;
+        
+                        // Display the fetched values
+                        document.getElementById('current-balance').textContent = `$${currentBalance.toFixed(2)}`;
+                        document.getElementById('amount-spent').textContent = `$${amountSpent.toFixed(2)}`;
+                    } else {
+                        alert('Failed to load balance data.');
+                    }
+                })
+                .catch(error => console.error('Error fetching balance data:', error));
+        });
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set username dynamically (fetch or set manually)
+           
+
+            // Handle Pie Chart
+            const ctx = document.getElementById('transactionPieChart').getContext('2d');
+
+            // Fetch transaction data from backend
             fetch('/transaction-data')
                 .then(response => response.json())
                 .then(data => {
@@ -223,7 +236,7 @@
                                     },
                                     tooltip: {
                                         callbacks: {
-                                            label: function(tooltipItem) {
+                                            label: function (tooltipItem) {
                                                 const value = tooltipItem.raw;
                                                 return `${tooltipItem.label}: $${value.toFixed(2)}`;
                                             }
@@ -239,9 +252,5 @@
                 .catch(error => console.error('Error fetching transaction data:', error));
         });
     </script>
-    <!-- templates/add_goal.html -->
-
-
-
 </body>
 </html>

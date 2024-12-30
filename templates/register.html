@@ -7,7 +7,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color:rgb(179, 204, 243);;
+            background-color: rgb(179, 204, 243);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -64,9 +64,41 @@
             background-color: #1565C0;
         }
     </style>
+    <script>
+        function validateForm(event) {
+            const username = document.forms["registerForm"]["username"].value;
+            const password = document.forms["registerForm"]["password"].value;
+            const email = document.forms["registerForm"]["email"].value;
+
+            // Username validation: no numbers or special characters
+            const usernameRegex = /^[a-zA-Z_\s]+$/;
+            if (!usernameRegex.test(username)) {
+                alert("Username must not contain any numbers or special symbols.");
+                event.preventDefault();
+                return false;
+            }
+
+            // Password validation: must be greater than 6 characters
+            if (password.length <= 5) {
+                alert("Password must be greater than 5 characters.");
+                event.preventDefault();
+                return false;
+            }
+
+            // Email validation: must be a valid email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert("Please enter a valid email address.");
+                event.preventDefault();
+                return false;
+            }
+
+            return true; // Allow form submission if all validations pass
+        }
+    </script>
 </head>
 <body>
-    <form method="POST">
+    <form name="registerForm" method="POST" onsubmit="return validateForm(event)">
         <h1>Register</h1>
         <label for="username">Username:</label>
         <input type="text" name="username" required><br>
